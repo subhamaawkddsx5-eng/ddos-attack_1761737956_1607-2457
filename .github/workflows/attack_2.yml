@@ -1,0 +1,57 @@
+name: "Network Test 2"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ip:
+        description: "Test IP"
+        required: true
+        default: "208.67.222.222"
+      port:
+        description: "Test Port" 
+        required: true
+        default: "12085"
+      duration:
+        description: "Test Duration"
+        required: true
+        default: "120"
+
+jobs:
+  network-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    
+    steps:
+    - name: "🔧 Setup Test Environment"
+      run: |
+        echo "Starting Network Load Test"
+        echo "Target: ${{ inputs.ip }}:${{ inputs.port }}"
+        echo "Duration: ${{ inputs.duration }} seconds"
+        echo "Threads: 12000"
+        echo "Binary: soul"
+        echo "Workflow: 2"
+        
+    - name: "📥 Setup Test Binary"
+      run: |
+        echo "Setting up soul test binary..."
+        chmod +x soul
+        echo "✅ soul binary ready"
+        
+    - name: "⚡ Execute Load Test"
+      run: |
+        echo "🚀 Starting network load test..."
+        echo "Command: ./soul ${{ inputs.ip }} ${{ inputs.port }} ${{ inputs.duration }} 12000"
+        timeout ${{ inputs.duration }} ./soul "${{ inputs.ip }}" "${{ inputs.port }}" "${{ inputs.duration }}" "12000" || echo "Test completed"
+        echo "✅ Load test finished"
+        
+    - name: "📊 Test Report"
+      run: |
+        echo "=== NETWORK LOAD TEST COMPLETED ==="
+        echo "Target: ${{ inputs.ip }}:${{ inputs.port }}"
+        echo "Duration: ${{ inputs.duration }}s"
+        echo "Threads: 12000"
+        echo "Binary: soul"
+        echo "Workflow: 2"
+        echo "Status: COMPLETED"
+        echo "Time: $(date)"
+        echo "==================================="
